@@ -9,11 +9,13 @@
  LIBNAME = lib$(TARGET).dll.a
  HEADER = Source/FreeImage.h
  
-@@ -53,7 +53,7 @@ $(STATICLIB): $(MODULES)
+@@ -52,8 +52,8 @@ $(STATICLIB): $(MODULES)
+ $(STATICLIB): $(MODULES)
  	$(AR) r $@ $(MODULES)
  
- $(SHAREDLIB): $(MODULES)
+-$(SHAREDLIB): $(MODULES)
 -	$(CC) -s -shared -o $@ \
++$(SHAREDLIB): $(STATICLIB)
 +	$(CC) -shared -o $@ \
  	    -Wl,--out-implib=$(LIBNAME) \
  	    -Wl,--export-all-symbols \
