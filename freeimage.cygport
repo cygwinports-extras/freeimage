@@ -2,7 +2,7 @@ inherit utils
 
 NAME="freeimage"
 VERSION=3.10.0
-RELEASE=1
+RELEASE=2
 CATEGORY="Libs"
 SUMMARY="Multi-format graphics library"
 DESCRIPTION="FreeImage is an Open Source library project for developers who
@@ -16,6 +16,7 @@ PATCH_URI="
 	http://pkgs.fedoraproject.org/cgit/freeimage.git/plain/FreeImage-3.10.0-syslibs.patch
 	http://pkgs.fedoraproject.org/cgit/freeimage.git/plain/FreeImage-3.10.0-doxygen.patch
 	http://pkgs.fedoraproject.org/cgit/freeimage.git/plain/FreeImage-3.10.0-libpng15.patch
+	http://pkgs.fedoraproject.org/cgit/freeimage.git/plain/FreeImage-3.10.0-libtiff4.patch
 	3.10.0-cygwin.patch
 	3.10.0-fiplus-build.patch
 "
