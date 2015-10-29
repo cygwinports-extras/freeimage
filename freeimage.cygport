@@ -1,8 +1,8 @@
 inherit utils
 
 NAME="freeimage"
-VERSION=3.10.0
-RELEASE=2
+VERSION=3.17.0
+RELEASE=1
 CATEGORY="Libs"
 SUMMARY="Multi-format graphics library"
 DESCRIPTION="FreeImage is an Open Source library project for developers who
@@ -13,13 +13,12 @@ HOMEPAGE="http://freeimage.sourceforge.net/"
 SRC_URI="mirror://sourceforge/freeimage/FreeImage${VERSION//.}.zip"
 SRC_DIR="FreeImage"
 PATCH_URI="
-	http://pkgs.fedoraproject.org/cgit/freeimage.git/plain/FreeImage-3.10.0-syslibs.patch
-	http://pkgs.fedoraproject.org/cgit/freeimage.git/plain/FreeImage-3.10.0-doxygen.patch
-	http://pkgs.fedoraproject.org/cgit/freeimage.git/plain/FreeImage-3.10.0-libpng15.patch
-	http://pkgs.fedoraproject.org/cgit/freeimage.git/plain/FreeImage-3.10.0-libtiff4.patch
-	3.10.0-cygwin.patch
-	3.10.0-fiplus-build.patch
+	http://pkgs.fedoraproject.org/cgit/freeimage.git/plain/FreeImage-3.17.0_unbundle.patch
+	http://pkgs.fedoraproject.org/cgit/freeimage.git/plain/FreeImage-3.17.0_doxygen.patch
+	http://pkgs.fedoraproject.org/cgit/freeimage.git/plain/FreeImage-3.17.0_CVE-2015-0852.patch
+	3.17.0-cygwin.patch
 "
+#	3.10.0-fiplus-build.patch
 
 PKG_NAMES="libfreeimage3 libfreeimage-devel libfreeimage-doc"
 libfreeimage3_CONTENTS="--exclude=html usr/bin/*-3.dll usr/share/doc/"
@@ -29,16 +28,26 @@ libfreeimage_doc_CONTENTS="usr/share/doc/${NAME}/html/"
 
 DIFF_EXCLUDES="doxygen.log *Makefile.srcs"
 
+CYGPORT_USE_UNSTABLE_API=1
+src_patch_hook() {
+	# remove all included libs to make sure these don't get used during compile
+	rm -r Source/Lib* Source/ZLib Source/OpenEXR
+	# clear files which cannot be built due to dependencies on private headers
+	# (see also unbundle patch)
+	> Source/FreeImage/PluginG3.cpp
+	> Source/FreeImageToolkit/JPEGTransform.cpp
+}
+
 src_compile() {
-	check_pkg_config FREEIMAGE_DEPS "libopenjpeg OpenEXR libpng zlib"
+	check_pkg_config FREEIMAGE_DEPS "libopenjp2 OpenEXR libpng libraw libtiff-4 libwebpmux zlib"
 
 	lndirs
 	cd ${B}
 	bash -o igncr ./gensrclist.sh
 	bash -o igncr ./genfipsrclist.sh
 	cygmake OS=Cygwin \
-		COMPILERFLAGS="${CXXFLAGS} ${FREEIMAGE_DEPS_CFLAGS}" \
-		LIBRARIES="-lstdc++ -ljpeg -lmng -ltiff ${FREEIMAGE_DEPS_LIBS}"
+		COMPILERFLAGS="${CXXFLAGS} -I/usr/include/jxrlib ${FREEIMAGE_DEPS_CFLAGS}" \
+		LIBRARIES="-lstdc++ -ljpeg -ljxrglue -lmng ${FREEIMAGE_DEPS_LIBS}"
 	cygmake -f Makefile.fip \
 		COMPILERFLAGS="${CXXFLAGS} -IDist"
 
